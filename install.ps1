@@ -8,37 +8,42 @@ Write-Host "Islands Dark Theme Installer for Windows" -ForegroundColor Cyan
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Check if VS Code is installed
-$codePath = Get-Command "code" -ErrorAction SilentlyContinue
-if (-not $codePath) {
-    # Try to find code in common locations
+# Check if Cursor is installed
+$editorCommand = "cursor"
+$editorPath = Get-Command $editorCommand -ErrorAction SilentlyContinue
+if (-not $editorPath) {
+    # Try to find cursor in common locations
     $possiblePaths = @(
-        "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd",
-        "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd",
-        "${env:ProgramFiles(x86)}\Microsoft VS Code\bin\code.cmd"
+        "$env:LOCALAPPDATA\Programs\Cursor\resources\app\bin\cursor.cmd",
+        "$env:LOCALAPPDATA\Programs\cursor\resources\app\bin\cursor.cmd",
+        "$env:LOCALAPPDATA\Programs\cursor\Cursor.exe",
+        "$env:LOCALAPPDATA\Programs\Cursor\Cursor.exe",
+        "$env:ProgramFiles\Cursor\Cursor.exe",
+        "${env:ProgramFiles(x86)}\Cursor\Cursor.exe"
     )
 
     $found = $false
     foreach ($path in $possiblePaths) {
         if (Test-Path $path) {
             $env:Path += ";$(Split-Path $path)"
+            $editorPath = Get-Command $editorCommand -ErrorAction SilentlyContinue
             $found = $true
             break
         }
     }
 
-    if (-not $found) {
-        Write-Host "Error: VS Code CLI (code) not found!" -ForegroundColor Red
-        Write-Host "Please install VS Code and make sure 'code' command is in your PATH."
+    if (-not $found -or -not $editorPath) {
+        Write-Host "Error: Cursor CLI (cursor) not found!" -ForegroundColor Red
+        Write-Host "Please install Cursor and make sure 'cursor' command is in your PATH."
         Write-Host "You can do this by:"
-        Write-Host "  1. Open VS Code"
+        Write-Host "  1. Open Cursor"
         Write-Host "  2. Press Ctrl+Shift+P"
-        Write-Host "  3. Type 'Shell Command: Install code command in PATH'"
+        Write-Host "  3. Type Shell Command: Install 'cursor' command"
         exit 1
     }
 }
 
-Write-Host "VS Code CLI found" -ForegroundColor Green
+Write-Host "Cursor CLI found" -ForegroundColor Green
 
 # Get the directory where this script is located
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -46,8 +51,8 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Write-Host ""
 Write-Host "Step 1: Installing Islands Dark theme extension..."
 
-# Install by copying to VS Code extensions directory
-$extDir = "$env:USERPROFILE\.vscode\extensions\bwya77.islands-dark-1.0.0"
+# Install by copying to Cursor extensions directory
+$extDir = "$env:USERPROFILE\.cursor\extensions\bwya77.islands-dark-1.0.0"
 if (Test-Path $extDir) {
     Remove-Item -Recurse -Force $extDir
 }
@@ -62,18 +67,18 @@ if (Test-Path "$extDir\themes") {
     exit 1
 }
 
-# Remove extensions.json so VS Code rebuilds it cleanly on next launch
+# Remove extensions.json so Cursor rebuilds it cleanly on next launch
 # (previous versions of this script wrote invalid content to this file)
-$extJsonPath = "$env:USERPROFILE\.vscode\extensions\extensions.json"
+$extJsonPath = "$env:USERPROFILE\.cursor\extensions\extensions.json"
 if (Test-Path $extJsonPath) {
     Remove-Item $extJsonPath -Force
-    Write-Host "Cleared extensions.json (VS Code will rebuild it)" -ForegroundColor Green
+    Write-Host "Cleared extensions.json (Cursor will rebuild it)" -ForegroundColor Green
 }
 
 Write-Host ""
 Write-Host "Step 2: Installing Custom UI Style extension..."
 try {
-    $output = code --install-extension subframe7536.custom-ui-style --force 2>&1
+    $output = & $editorCommand --install-extension subframe7536.custom-ui-style --force 2>&1
     Write-Host "Custom UI Style extension installed" -ForegroundColor Green
 } catch {
     Write-Host "Could not install Custom UI Style extension automatically" -ForegroundColor Yellow
@@ -108,8 +113,8 @@ try {
 }
 
 Write-Host ""
-Write-Host "Step 4: Applying VS Code settings..."
-$settingsDir = "$env:APPDATA\Code\User"
+Write-Host "Step 4: Applying Cursor settings..."
+$settingsDir = "$env:APPDATA\Cursor\User"
 if (-not (Test-Path $settingsDir)) {
     New-Item -ItemType Directory -Path $settingsDir -Force | Out-Null
 }
@@ -139,10 +144,10 @@ if (-not (Test-Path $firstRunFile)) {
     Write-Host ""
     Write-Host "Important Notes:" -ForegroundColor Yellow
     Write-Host "   - IBM Plex Mono and FiraCode Nerd Font Mono need to be installed separately"
-    Write-Host "   - After VS Code reloads, you may see a 'corrupt installation' warning"
+    Write-Host "   - After Cursor reloads, you may see a 'corrupt installation' warning"
     Write-Host "   - This is expected - click the gear icon and select 'Don't Show Again'"
     Write-Host ""
-    Read-Host "Press Enter to continue and reload VS Code"
+    Read-Host "Press Enter to continue and reload Cursor"
 }
 
 Write-Host "   Applying CSS customizations..."
@@ -151,13 +156,13 @@ Write-Host ""
 Write-Host "Islands Dark theme has been installed!" -ForegroundColor Green
 Write-Host ""
 
-# Quit VS Code and relaunch so Custom UI Style fully initializes and patches CSS
-Write-Host "   Closing VS Code..." -ForegroundColor Cyan
-Stop-Process -Name "Code" -Force -ErrorAction SilentlyContinue
+# Quit Cursor and relaunch so Custom UI Style fully initializes and patches CSS
+Write-Host "   Closing Cursor..." -ForegroundColor Cyan
+Stop-Process -Name "Cursor" -Force -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 3
 
-Write-Host "   Relaunching VS Code..." -ForegroundColor Cyan
-Start-Process "code" -ErrorAction SilentlyContinue
+Write-Host "   Relaunching Cursor..." -ForegroundColor Cyan
+Start-Process $editorCommand -ErrorAction SilentlyContinue
 
 Write-Host ""
 Write-Host "Done!" -ForegroundColor Green
