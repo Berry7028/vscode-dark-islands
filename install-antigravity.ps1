@@ -47,32 +47,38 @@ Write-Host ""
 Write-Host "Step 2: Installing Custom UI Style extension..."
 Write-Host "   Note: Antigravity supports VS Code extensions" -ForegroundColor DarkGray
 try {
-    # Use code CLI if available (Antigravity may use same command)
-    $codePath = Get-Command "code" -ErrorAction SilentlyContinue
-    if ($codePath) {
-        $output = code --install-extension subframe7536.custom-ui-style --force 2>&1
+    # Prefer Cursor CLI, then fall back to VS Code CLI
+    $cursorPath = Get-Command "cursor" -ErrorAction SilentlyContinue
+    if ($cursorPath) {
+        $output = cursor --install-extension subframe7536.custom-ui-style --force 2>&1
         Write-Host "Custom UI Style extension installed" -ForegroundColor Green
     } else {
-        # Try common VS Code installation paths
-        $possiblePaths = @(
-            "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd",
-            "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd",
-            "${env:ProgramFiles(x86)}\Microsoft VS Code\bin\code.cmd"
-        )
-        
-        $found = $false
-        foreach ($path in $possiblePaths) {
-            if (Test-Path $path) {
-                & $path --install-extension subframe7536.custom-ui-style --force 2>&1 | Out-Null
-                $found = $true
-                Write-Host "Custom UI Style extension installed" -ForegroundColor Green
-                break
+        $codePath = Get-Command "code" -ErrorAction SilentlyContinue
+        if ($codePath) {
+            $output = code --install-extension subframe7536.custom-ui-style --force 2>&1
+            Write-Host "Custom UI Style extension installed" -ForegroundColor Green
+        } else {
+            # Try common VS Code installation paths
+            $possiblePaths = @(
+                "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd",
+                "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd",
+                "${env:ProgramFiles(x86)}\Microsoft VS Code\bin\code.cmd"
+            )
+            
+            $found = $false
+            foreach ($path in $possiblePaths) {
+                if (Test-Path $path) {
+                    & $path --install-extension subframe7536.custom-ui-style --force 2>&1 | Out-Null
+                    $found = $true
+                    Write-Host "Custom UI Style extension installed" -ForegroundColor Green
+                    break
+                }
             }
-        }
-        
-        if (-not $found) {
-            Write-Host "Could not install Custom UI Style extension automatically" -ForegroundColor Yellow
-            Write-Host "   Please install it manually from the Extensions marketplace in Antigravity"
+            
+            if (-not $found) {
+                Write-Host "Could not install Custom UI Style extension automatically" -ForegroundColor Yellow
+                Write-Host "   Please install it manually from the Extensions marketplace in Antigravity"
+            }
         }
     }
 } catch {
