@@ -44,13 +44,13 @@ The fastest way to install:
 #### macOS/Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/bwya77/vscode-dark-islands/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Berry7028/vscode-dark-islands/main/bootstrap.sh | bash
 ```
 
 #### Windows
 
 ```powershell
-irm https://raw.githubusercontent.com/bwya77/vscode-dark-islands/main/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Berry7028/vscode-dark-islands/main/bootstrap.ps1 | iex
 ```
 
 ### Manual Clone Install
@@ -279,7 +279,7 @@ cd islands-dark
 ./uninstall.sh
 
 # Or download and run directly:
-curl -fsSL https://raw.githubusercontent.com/bwya77/vscode-dark-islands/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Berry7028/vscode-dark-islands/main/uninstall.sh | bash
 ```
 
 **Windows (PowerShell):**
@@ -289,7 +289,7 @@ cd islands-dark
 .\uninstall.ps1
 
 # Or download and run directly:
-irm https://raw.githubusercontent.com/bwya77/vscode-dark-islands/main/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/Berry7028/vscode-dark-islands/main/uninstall.ps1 | iex
 ```
 
 The uninstall script will:
